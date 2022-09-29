@@ -664,6 +664,9 @@ type Configuration struct {
 	// HTTPSnippet adds custom configuration to the http section of the nginx configuration
 	HTTPSnippet string `json:"http-snippet"`
 
+	// MaintenancePageUrl overrides url of the maintenance Page
+	MaintenancePageUrl string `json:"maintenance-page-url"`
+
 	// ServerSnippet adds custom configuration to all the servers in the nginx configuration
 	ServerSnippet string `json:"server-snippet"`
 

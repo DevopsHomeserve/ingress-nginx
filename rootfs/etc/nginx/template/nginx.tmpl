@@ -659,6 +659,24 @@ http {
         {{ $cfg.ServerSnippet }}
         {{ end }}
 
+        ## maintenance page
+        if (-f /maintenance/$host) {
+        set $maintenance 1;
+        }
+        if ($maintenance = 1) {
+        return 503;
+        }
+        error_page 503 @maintenance;
+        location @maintenance {
+        {{ if not (empty $server.MaintenancePageUrl) }}
+        # overridee url maintenance page 
+        proxy_pass {{ $server.MaintenancePageUrl }};
+        {{ else }}
+        proxy_pass "https://maintenance-page.homeserve.io";
+        {{ end }}
+        }
+        ## end maintenance page
+        
         {{ template "CUSTOM_ERRORS" (buildCustomErrorDeps "upstream-default-backend" $cfg.CustomHTTPErrors $all.EnableMetrics $cfg.EnableModsecurity) }}
     }
     ## end server {{ $server.Hostname }}
@@ -1023,6 +1041,24 @@ stream {
         # Custom code snippet configured for host {{ $server.Hostname }}
         {{ $server.ServerSnippet }}
         {{ end }}
+
+        ## maintenance page
+        if (-f /maintenance/$host) {
+        set $maintenance 1;
+        }
+        if ($maintenance = 1) {
+        return 503;
+        }
+        error_page 503 @maintenance;
+        location @maintenance {
+        {{ if not (empty $server.MaintenancePageUrl) }}
+        # overridee url maintenance page 
+        proxy_pass {{ $server.MaintenancePageUrl }};
+        {{ else }}
+        proxy_pass "https://maintenance-page.homeserve.io";
+        {{ end }}
+        }
+        ## end maintenance page
 
         {{ range $errorLocation := (buildCustomErrorLocationsPerServer $server) }}
         {{ template "CUSTOM_ERRORS" (buildCustomErrorDeps $errorLocation.UpstreamName $errorLocation.Codes $all.EnableMetrics $all.Cfg.EnableModsecurity) }}

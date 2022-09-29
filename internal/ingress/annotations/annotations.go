@@ -47,6 +47,7 @@ import (
 	"k8s.io/ingress-nginx/internal/ingress/annotations/ipwhitelist"
 	"k8s.io/ingress-nginx/internal/ingress/annotations/loadbalancing"
 	"k8s.io/ingress-nginx/internal/ingress/annotations/log"
+	"k8s.io/ingress-nginx/internal/ingress/annotations/maintenancepage"
 	"k8s.io/ingress-nginx/internal/ingress/annotations/mirror"
 	"k8s.io/ingress-nginx/internal/ingress/annotations/opentracing"
 	"k8s.io/ingress-nginx/internal/ingress/annotations/parser"
@@ -92,6 +93,7 @@ type Ingress struct {
 	ExternalAuth       authreq.Config
 	EnableGlobalAuth   bool
 	HTTP2PushPreload   bool
+	MaintenancePageUrl string
 	Opentracing        opentracing.Config
 	Proxy              proxy.Config
 	ProxySSL           proxyssl.Config
@@ -142,6 +144,7 @@ func NewAnnotationExtractor(cfg resolver.Resolver) Extractor {
 			"ExternalAuth":         authreq.NewParser(cfg),
 			"EnableGlobalAuth":     authreqglobal.NewParser(cfg),
 			"HTTP2PushPreload":     http2pushpreload.NewParser(cfg),
+			"MaintenancePageUrl":   maintenancepage.NewParser(cfg),
 			"Opentracing":          opentracing.NewParser(cfg),
 			"Proxy":                proxy.NewParser(cfg),
 			"ProxySSL":             proxyssl.NewParser(cfg),

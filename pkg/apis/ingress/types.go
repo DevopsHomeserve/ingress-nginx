@@ -204,6 +204,9 @@ type Server struct {
 	// ProxySSL indicates the this server uses client certificate to access backends
 	// +optional
 	ProxySSL proxyssl.Config `json:"proxySSL"`
+	// MaintenancePageUrl overrides url of the maintenance Page
+	// +optional
+	MaintenancePageUrl string `json:"maintenancePageUrl"`
 	// ServerSnippet returns the snippet of server
 	// +optional
 	ServerSnippet string `json:"serverSnippet"`
