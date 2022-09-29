@@ -1299,7 +1299,14 @@ func (n *NGINXController) createServers(data []*ingress.Ingress,
 						host, ingKey)
 				}
 			}
-
+			if anns.MaintenancePageUrl != "" {
+				if servers[host].MaintenancePageUrl == "" {
+					servers[host].MaintenancePageUrl = anns.MaintenancePageUrl
+				} else {
+					klog.Warningf("Server snippet already configured for server %q, skipping (Ingress %q)",
+						host, ingKey)
+				}
+			}
 			// only add SSL ciphers if the server does not have them previously configured
 			if servers[host].SSLCiphers == "" && anns.SSLCipher.SSLCiphers != "" {
 				servers[host].SSLCiphers = anns.SSLCipher.SSLCiphers
