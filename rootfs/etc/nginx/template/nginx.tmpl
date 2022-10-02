@@ -1597,6 +1597,10 @@ stream {
             }
             error_page 503 @maintenance;
 
+            if (-f /redirections/$host) {
+                include /redirections/$host;
+            }
+
             {{ if $location.Mirror.Source }}
             mirror {{ $location.Mirror.Source }};
             mirror_request_body {{ $location.Mirror.RequestBody }};
