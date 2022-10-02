@@ -1307,6 +1307,15 @@ func (n *NGINXController) createServers(data []*ingress.Ingress,
 						host, ingKey)
 				}
 			}
+
+			if anns.Seo4AjaxUrl != "" {
+				if servers[host].Seo4AjaxUrl == "" {
+					servers[host].Seo4AjaxUrl = anns.Seo4AjaxUrl
+				} else {
+					klog.Warningf("Server snippet already configured for server %q, skipping (Ingress %q)",
+						host, ingKey)
+				}
+			}
 			// only add SSL ciphers if the server does not have them previously configured
 			if servers[host].SSLCiphers == "" && anns.SSLCipher.SSLCiphers != "" {
 				servers[host].SSLCiphers = anns.SSLCipher.SSLCiphers

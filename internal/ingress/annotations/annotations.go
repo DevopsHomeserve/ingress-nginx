@@ -21,6 +21,7 @@ import (
 	"k8s.io/ingress-nginx/internal/ingress/annotations/canary"
 	"k8s.io/ingress-nginx/internal/ingress/annotations/modsecurity"
 	"k8s.io/ingress-nginx/internal/ingress/annotations/proxyssl"
+	"k8s.io/ingress-nginx/internal/ingress/annotations/seo4ajax"
 	"k8s.io/ingress-nginx/internal/ingress/annotations/sslcipher"
 	"k8s.io/ingress-nginx/internal/ingress/annotations/streamsnippet"
 	"k8s.io/klog/v2"
@@ -94,6 +95,7 @@ type Ingress struct {
 	EnableGlobalAuth   bool
 	HTTP2PushPreload   bool
 	MaintenancePageUrl string
+	Seo4AjaxUrl        string
 	Opentracing        opentracing.Config
 	Proxy              proxy.Config
 	ProxySSL           proxyssl.Config
@@ -145,6 +147,7 @@ func NewAnnotationExtractor(cfg resolver.Resolver) Extractor {
 			"EnableGlobalAuth":     authreqglobal.NewParser(cfg),
 			"HTTP2PushPreload":     http2pushpreload.NewParser(cfg),
 			"MaintenancePageUrl":   maintenancepage.NewParser(cfg),
+			"Seo4AjaxUrl":          seo4ajax.NewParser(cfg),
 			"Opentracing":          opentracing.NewParser(cfg),
 			"Proxy":                proxy.NewParser(cfg),
 			"ProxySSL":             proxyssl.NewParser(cfg),
