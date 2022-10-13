@@ -209,7 +209,7 @@ type Server struct {
 	MaintenancePageUrl string `json:"maintenancePageUrl"`
 	// MaintenancePageUrl overrides url of the maintenance Page
 	// +optional
-	Seo4AjaxUrl string `json:"seo4AjaxUrl"`
+	Seo4AjaxPath string `json:"seo4AjaxPath"`
 	// ServerSnippet returns the snippet of server
 	// +optional
 	ServerSnippet string `json:"serverSnippet"`

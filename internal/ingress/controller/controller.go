@@ -1308,9 +1308,9 @@ func (n *NGINXController) createServers(data []*ingress.Ingress,
 				}
 			}
 
-			if anns.Seo4AjaxUrl != "" {
-				if servers[host].Seo4AjaxUrl == "" {
-					servers[host].Seo4AjaxUrl = anns.Seo4AjaxUrl
+			if anns.Seo4AjaxPath != "" {
+				if servers[host].Seo4AjaxPath == "" {
+					servers[host].Seo4AjaxPath = anns.Seo4AjaxPath
 				} else {
 					klog.Warningf("Server snippet already configured for server %q, skipping (Ingress %q)",
 						host, ingKey)

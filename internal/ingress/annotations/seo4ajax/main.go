@@ -23,18 +23,18 @@ import (
 	"k8s.io/ingress-nginx/internal/ingress/resolver"
 )
 
-type seo4AjaxUrl struct {
+type seo4AjaxPath struct {
 	r resolver.Resolver
 }
 
 // NewParser creates a new server snippet annotation parser
 func NewParser(r resolver.Resolver) parser.IngressAnnotation {
-	return seo4AjaxUrl{r}
+	return seo4AjaxPath{r}
 }
 
 // Parse parses the annotations contained in the ingress rule
 // used to indicate if the location/s contains a fragment of
 // configuration to be included inside the paths of the rules
-func (a seo4AjaxUrl) Parse(ing *networking.Ingress) (interface{}, error) {
-	return parser.GetStringAnnotation("seo4Ajax-url", ing)
+func (a seo4AjaxPath) Parse(ing *networking.Ingress) (interface{}, error) {
+	return parser.GetStringAnnotation("seo4Ajax-path", ing)
 }
