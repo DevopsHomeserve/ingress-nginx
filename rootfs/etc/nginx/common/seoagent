@@ -1,0 +1,16 @@
+map $http_user_agent $check_agent {
+    default                 1;
+    "google"                0;
+    "bot"                   0;
+    "spider"                0;
+    "pinterest"             0;
+    "crawler"               0;
+    "archiver"              0;
+    "flipboardproxy"        0;
+    "mediapartners"         0;
+    "facebookexternalhit"   0;
+    "insights"              0;
+    "quora"                 0;
+    "whatsapp"              0;
+    "slurp"                 0;
+}

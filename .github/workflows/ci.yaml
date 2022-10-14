@@ -13,18 +13,16 @@ permissions:
   contents: read
 
 jobs:
-
   changes:
     permissions:
-      contents: read  # for dorny/paths-filter to fetch a list of changed files
-      pull-requests: read  # for dorny/paths-filter to read pull requests
+      contents: read # for dorny/paths-filter to fetch a list of changed files
+      pull-requests: read # for dorny/paths-filter to read pull requests
     runs-on: ubuntu-latest
     outputs:
       go: ${{ steps.filter.outputs.go }}
       charts: ${{ steps.filter.outputs.charts }}
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.0.2
 
@@ -44,11 +42,9 @@ jobs:
               - 'charts/ingress-nginx/Chart.yaml'
               - 'charts/ingress-nginx/**/*'
 
-
   security:
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.0.2
 
@@ -66,7 +62,6 @@ jobs:
     needs: changes
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.0.2
 
@@ -74,7 +69,7 @@ jobs:
         id: go
         uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f # v3.2.0
         with:
-          go-version: '1.19.2'
+          go-version: "1.19.2"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@8b122486cedac8393e77aa9734c3528886e4a1a8 #v2.0.0
@@ -100,7 +95,7 @@ jobs:
         env:
           TAG: 1.0.0-dev
           ARCH: amd64
-          REGISTRY: ingress-controller
+          REGISTRY: homeserve
         run: |
           echo "building images..."
           make clean-image build image image-chroot
@@ -119,208 +114,202 @@ jobs:
           name: docker.tar.gz
           path: docker.tar.gz
 
-  helm:
-    name: Helm chart
-    runs-on: ubuntu-latest
-    needs:
-      - changes
-      - build
-    if: |
-      (needs.changes.outputs.charts == 'true')
+  # helm:
+  #   name: Helm chart
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - changes
+  #     - build
+  #   if: |
+  #     (needs.changes.outputs.charts == 'true')
 
-    strategy:
-      matrix:
-        k8s: [v1.22.15, v1.23.12, v1.24.6, v1.25.2]
+  #   strategy:
+  #     matrix:
+  #       k8s: [v1.22.15, v1.23.12, v1.24.6, v1.25.2]
 
-    steps:
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.0.2
 
-      - name: Checkout
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.0.2
+  #     - name: Setup Go
+  #       uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f # v3.2.0
+  #       with:
+  #         go-version: "1.19.2"
 
-      - name: Setup Go
-        uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f # v3.2.0
-        with:
-          go-version: '1.19.2'
+  #     - name: cache
+  #       uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3
+  #       with:
+  #         name: docker.tar.gz
 
-      - name: cache
-        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3
-        with:
-          name: docker.tar.gz
+  #     - name: Lint
+  #       run: |
+  #         ./build/run-in-docker.sh ./hack/verify-chart-lint.sh
 
-      - name: Lint
-        run: |
-          ./build/run-in-docker.sh ./hack/verify-chart-lint.sh
+  #     - name: Run helm-docs
+  #       run: |
+  #         GOBIN=$PWD GO111MODULE=on go install github.com/norwoodj/helm-docs/cmd/helm-docs@v1.11.0
+  #         ./helm-docs --chart-search-root=${GITHUB_WORKSPACE}/charts
+  #         DIFF=$(git diff ${GITHUB_WORKSPACE}/charts/ingress-nginx/README.md)
+  #         if [ ! -z "$DIFF" ]; then
+  #           echo "Please use helm-docs in your clone, of your fork, of the project, and commit a updated README.md for the chart. https://github.com/DevopsHomeserve/ingress-nginx/blob/main/RELEASE.md#d-edit-the-valuesyaml-and-run-helm-docs"
+  #         fi
+  #         git diff --exit-code
+  #         rm -f ./helm-docs
 
-      - name: Run helm-docs
-        run: |
-          GOBIN=$PWD GO111MODULE=on go install github.com/norwoodj/helm-docs/cmd/helm-docs@v1.11.0
-          ./helm-docs --chart-search-root=${GITHUB_WORKSPACE}/charts
-          DIFF=$(git diff ${GITHUB_WORKSPACE}/charts/ingress-nginx/README.md)
-          if [ ! -z "$DIFF" ]; then
-            echo "Please use helm-docs in your clone, of your fork, of the project, and commit a updated README.md for the chart. https://github.com/kubernetes/ingress-nginx/blob/main/RELEASE.md#d-edit-the-valuesyaml-and-run-helm-docs"
-          fi
-          git diff --exit-code
-          rm -f ./helm-docs
+  #     - name: Run Artifact Hub lint
+  #       run: |
+  #         wget https://github.com/artifacthub/hub/releases/download/v1.5.0/ah_1.5.0_linux_amd64.tar.gz
+  #         echo 'ad0e44c6ea058ab6b85dbf582e88bad9fdbc64ded0d1dd4edbac65133e5c87da *ah_1.5.0_linux_amd64.tar.gz' | shasum -c
+  #         tar -xzvf ah_1.5.0_linux_amd64.tar.gz ah
+  #         ./ah lint -p charts/ingress-nginx || exit 1
+  #         rm -f ./ah ./ah_1.5.0_linux_amd64.tar.gz
 
-      - name: Run Artifact Hub lint
-        run: |
-          wget https://github.com/artifacthub/hub/releases/download/v1.5.0/ah_1.5.0_linux_amd64.tar.gz
-          echo 'ad0e44c6ea058ab6b85dbf582e88bad9fdbc64ded0d1dd4edbac65133e5c87da *ah_1.5.0_linux_amd64.tar.gz' | shasum -c
-          tar -xzvf ah_1.5.0_linux_amd64.tar.gz ah
-          ./ah lint -p charts/ingress-nginx || exit 1
-          rm -f ./ah ./ah_1.5.0_linux_amd64.tar.gz
+  #     - name: fix permissions
+  #       run: |
+  #         sudo mkdir -p $HOME/.kube
+  #         sudo chmod -R 777 $HOME/.kube
 
-      - name: fix permissions
-        run: |
-          sudo mkdir -p $HOME/.kube
-          sudo chmod -R 777 $HOME/.kube
+  #     - name: Create Kubernetes ${{ matrix.k8s }} cluster
+  #       id: kind
+  #       uses: engineerd/setup-kind@aa272fe2a7309878ffc2a81c56cfe3ef108ae7d0 #v0.5.0
+  #       with:
+  #         version: v0.15.0
+  #         image: kindest/node:${{ matrix.k8s }}
 
-      - name: Create Kubernetes ${{ matrix.k8s }} cluster
-        id: kind
-        uses: engineerd/setup-kind@aa272fe2a7309878ffc2a81c56cfe3ef108ae7d0 #v0.5.0
-        with:
-          version: v0.15.0
-          image: kindest/node:${{ matrix.k8s }}
+  #     - uses: geekyeggo/delete-artifact@b73cb986740e466292a536d0e32e2666c56fdeb3 # v1
+  #       with:
+  #         name: docker.tar.gz
+  #         failOnError: false
 
-      - uses: geekyeggo/delete-artifact@b73cb986740e466292a536d0e32e2666c56fdeb3 # v1
-        with:
-          name: docker.tar.gz
-          failOnError: false
+  #     - name: Load images from cache
+  #       run: |
+  #         echo "loading docker images..."
+  #         pigz -dc docker.tar.gz | docker load
 
-      - name: Load images from cache
-        run: |
-          echo "loading docker images..."
-          pigz -dc docker.tar.gz | docker load
+  #     - name: Test
+  #       env:
+  #         KIND_CLUSTER_NAME: kind
+  #         SKIP_CLUSTER_CREATION: true
+  #         SKIP_IMAGE_CREATION: true
+  #       run: |
+  #         kind get kubeconfig > $HOME/.kube/kind-config-kind
+  #         make kind-e2e-chart-tests
 
-      - name: Test
-        env:
-          KIND_CLUSTER_NAME: kind
-          SKIP_CLUSTER_CREATION: true
-          SKIP_IMAGE_CREATION: true
-        run: |
-          kind get kubeconfig > $HOME/.kube/kind-config-kind
-          make kind-e2e-chart-tests
+  # kubernetes:
+  #   name: Kubernetes
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - changes
+  #     - build
+  #   if: |
+  #     (needs.changes.outputs.go == 'true')
 
+  #   strategy:
+  #     matrix:
+  #       k8s: [v1.23.12, v1.24.6, v1.25.2]
 
-  kubernetes:
-    name: Kubernetes
-    runs-on: ubuntu-latest
-    needs:
-      - changes
-      - build
-    if: |
-      (needs.changes.outputs.go == 'true')
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.0.2
 
-    strategy:
-      matrix:
-        k8s: [v1.23.12, v1.24.6, v1.25.2]
+  #     - name: cache
+  #       uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v2
+  #       with:
+  #         name: docker.tar.gz
 
-    steps:
+  #     - name: Create Kubernetes ${{ matrix.k8s }} cluster
+  #       id: kind
+  #       uses: engineerd/setup-kind@aa272fe2a7309878ffc2a81c56cfe3ef108ae7d0 #v0.5.0
+  #       with:
+  #         version: v0.15.0
+  #         config: test/e2e/kind.yaml
+  #         image: kindest/node:${{ matrix.k8s }}
 
-      - name: Checkout
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.0.2
+  #     - uses: geekyeggo/delete-artifact@b73cb986740e466292a536d0e32e2666c56fdeb3 # v1
+  #       with:
+  #         name: docker.tar.gz
+  #         failOnError: false
 
-      - name: cache
-        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v2
-        with:
-          name: docker.tar.gz
+  #     - name: Prepare cluster for testing
+  #       uses: azure/setup-helm@b5b231a831f96336bbfeccc1329990f0005c5bb1 #v2.1
+  #       with:
+  #         version: "v3.8.0"
+  #       id: local-path
 
-      - name: Create Kubernetes ${{ matrix.k8s }} cluster
-        id: kind
-        uses: engineerd/setup-kind@aa272fe2a7309878ffc2a81c56cfe3ef108ae7d0 #v0.5.0
-        with:
-          version: v0.15.0
-          config: test/e2e/kind.yaml
-          image: kindest/node:${{ matrix.k8s }}
+  #     - name: Load images from cache
+  #       run: |
+  #         echo "loading docker images..."
+  #         pigz -dc docker.tar.gz | docker load
 
-      - uses: geekyeggo/delete-artifact@b73cb986740e466292a536d0e32e2666c56fdeb3 # v1
-        with:
-          name: docker.tar.gz
-          failOnError: false
+  #     - name: Run e2e tests
+  #       env:
+  #         KIND_CLUSTER_NAME: kind
+  #         SKIP_CLUSTER_CREATION: true
+  #         SKIP_IMAGE_CREATION: true
+  #       run: |
+  #         kind get kubeconfig > $HOME/.kube/kind-config-kind
+  #         make kind-e2e-test
 
-      - name: Prepare cluster for testing
-        uses: azure/setup-helm@b5b231a831f96336bbfeccc1329990f0005c5bb1 #v2.1
-        with:
-          version: 'v3.8.0'
-        id: local-path
+  # kubernetes-chroot:
+  #   name: Kubernetes chroot
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - changes
+  #     - build
+  #   if: |
+  #     (needs.changes.outputs.go == 'true')
 
-      - name: Load images from cache
-        run: |
-          echo "loading docker images..."
-          pigz -dc docker.tar.gz | docker load
+  #   strategy:
+  #     matrix:
+  #       k8s: [v1.23.12, v1.24.6, v1.25.2]
 
-      - name: Run e2e tests
-        env:
-          KIND_CLUSTER_NAME: kind
-          SKIP_CLUSTER_CREATION: true
-          SKIP_IMAGE_CREATION: true
-        run: |
-          kind get kubeconfig > $HOME/.kube/kind-config-kind
-          make kind-e2e-test
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.0.2
 
+  #     - name: cache
+  #       uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741
+  #       with:
+  #         name: docker.tar.gz
 
-  kubernetes-chroot:
-    name: Kubernetes chroot
-    runs-on: ubuntu-latest
-    needs:
-      - changes
-      - build
-    if: |
-      (needs.changes.outputs.go == 'true')
+  #     - name: Create Kubernetes ${{ matrix.k8s }} cluster
+  #       id: kind
+  #       uses: engineerd/setup-kind@aa272fe2a7309878ffc2a81c56cfe3ef108ae7d0 #v0.5.0
+  #       with:
+  #         version: v0.15.0
+  #         config: test/e2e/kind.yaml
+  #         image: kindest/node:${{ matrix.k8s }}
 
-    strategy:
-      matrix:
-        k8s: [v1.23.12, v1.24.6, v1.25.2]
+  #     - uses: geekyeggo/delete-artifact@b73cb986740e466292a536d0e32e2666c56fdeb3
+  #       with:
+  #         name: docker.tar.gz
+  #         failOnError: false
 
-    steps:
+  #     - name: Prepare cluster for testing
+  #       uses: azure/setup-helm@b5b231a831f96336bbfeccc1329990f0005c5bb1 #v2.1
+  #       with:
+  #         version: "v3.8.0"
+  #       id: local-path
 
-      - name: Checkout
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.0.2
+  #     - name: Load images from cache
+  #       run: |
+  #         echo "loading docker images..."
+  #         pigz -dc docker.tar.gz | docker load
 
-      - name: cache
-        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741
-        with:
-          name: docker.tar.gz
-
-      - name: Create Kubernetes ${{ matrix.k8s }} cluster
-        id: kind
-        uses: engineerd/setup-kind@aa272fe2a7309878ffc2a81c56cfe3ef108ae7d0 #v0.5.0
-        with:
-          version: v0.15.0
-          config: test/e2e/kind.yaml
-          image: kindest/node:${{ matrix.k8s }}
-
-      - uses: geekyeggo/delete-artifact@b73cb986740e466292a536d0e32e2666c56fdeb3
-        with:
-          name: docker.tar.gz
-          failOnError: false
-
-      - name: Prepare cluster for testing
-        uses: azure/setup-helm@b5b231a831f96336bbfeccc1329990f0005c5bb1 #v2.1
-        with:
-          version: 'v3.8.0'
-        id: local-path
-
-      - name: Load images from cache
-        run: |
-          echo "loading docker images..."
-          pigz -dc docker.tar.gz | docker load
-
-      - name: Run e2e tests
-        env:
-          KIND_CLUSTER_NAME: kind
-          SKIP_CLUSTER_CREATION: true
-          SKIP_IMAGE_CREATION: true
-          IS_CHROOT: true
-        run: |
-          kind get kubeconfig > $HOME/.kube/kind-config-kind
-          make kind-e2e-test
-
+  #     - name: Run e2e tests
+  #       env:
+  #         KIND_CLUSTER_NAME: kind
+  #         SKIP_CLUSTER_CREATION: true
+  #         SKIP_IMAGE_CREATION: true
+  #         IS_CHROOT: true
+  #       run: |
+  #         kind get kubeconfig > $HOME/.kube/kind-config-kind
+  #         make kind-e2e-test
 
   test-image-build:
     permissions:
-      contents: read  # for dorny/paths-filter to fetch a list of changed files
-      pull-requests: read  # for dorny/paths-filter to read pull requests
+      contents: read # for dorny/paths-filter to fetch a list of changed files
+      pull-requests: read # for dorny/paths-filter to read pull requests
     runs-on: ubuntu-latest
     env:
       PLATFORMS: linux/amd64,linux/arm64
@@ -383,11 +372,10 @@ jobs:
         run: |
           cd images/ext-auth-example-authsvc && make build
 
-
   test-image:
     permissions:
-      contents: read  # for dorny/paths-filter to fetch a list of changed files
-      pull-requests: read  # for dorny/paths-filter to read pull requests
+      contents: read # for dorny/paths-filter to fetch a list of changed files
+      pull-requests: read # for dorny/paths-filter to read pull requests
     runs-on: ubuntu-latest
     env:
       PLATFORMS: linux/amd64
@@ -416,7 +404,7 @@ jobs:
         if: ${{ steps.filter-images.outputs.kube-webhook-certgen == 'true' }}
         uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f # v3.2.0
         with:
-          go-version: '1.19.2'
+          go-version: "1.19.2"
 
       - name: kube-webhook-certgen image build
         if: ${{ steps.filter-images.outputs.kube-webhook-certgen == 'true' }}

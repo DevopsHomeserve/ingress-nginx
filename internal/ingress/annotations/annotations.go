@@ -53,6 +53,7 @@ import (
 	"k8s.io/ingress-nginx/internal/ingress/annotations/opentracing"
 	"k8s.io/ingress-nginx/internal/ingress/annotations/parser"
 	"k8s.io/ingress-nginx/internal/ingress/annotations/portinredirect"
+	"k8s.io/ingress-nginx/internal/ingress/annotations/privatepathexact"
 	"k8s.io/ingress-nginx/internal/ingress/annotations/proxy"
 	"k8s.io/ingress-nginx/internal/ingress/annotations/ratelimit"
 	"k8s.io/ingress-nginx/internal/ingress/annotations/redirect"
@@ -95,6 +96,7 @@ type Ingress struct {
 	EnableGlobalAuth   bool
 	HTTP2PushPreload   bool
 	MaintenancePageUrl string
+	PrivatePathExact   []string
 	Seo4AjaxPath       string
 	Opentracing        opentracing.Config
 	Proxy              proxy.Config
@@ -147,6 +149,7 @@ func NewAnnotationExtractor(cfg resolver.Resolver) Extractor {
 			"EnableGlobalAuth":     authreqglobal.NewParser(cfg),
 			"HTTP2PushPreload":     http2pushpreload.NewParser(cfg),
 			"MaintenancePageUrl":   maintenancepage.NewParser(cfg),
+			"PrivatePathExact":     privatepathexact.NewParser(cfg),
 			"Seo4AjaxPath":         seo4ajax.NewParser(cfg),
 			"Opentracing":          opentracing.NewParser(cfg),
 			"Proxy":                proxy.NewParser(cfg),

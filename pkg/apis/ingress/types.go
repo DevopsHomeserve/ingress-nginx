@@ -360,6 +360,8 @@ type Location struct {
 	// Opentracing allows the global opentracing setting to be overridden for a location
 	// +optional
 	Opentracing opentracing.Config `json:"opentracing"`
+
+	PrivatePathExact []string `json:"privatepathexact"`
 }
 
 // SSLPassthroughBackend describes a SSL upstream server configured

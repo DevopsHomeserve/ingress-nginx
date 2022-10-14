@@ -1303,7 +1303,7 @@ func (n *NGINXController) createServers(data []*ingress.Ingress,
 				if servers[host].MaintenancePageUrl == "" {
 					servers[host].MaintenancePageUrl = anns.MaintenancePageUrl
 				} else {
-					klog.Warningf("Server snippet already configured for server %q, skipping (Ingress %q)",
+					klog.Warningf("MaintenancePageUrl already configured for server %q, skipping (Ingress %q)",
 						host, ingKey)
 				}
 			}
@@ -1312,7 +1312,7 @@ func (n *NGINXController) createServers(data []*ingress.Ingress,
 				if servers[host].Seo4AjaxPath == "" {
 					servers[host].Seo4AjaxPath = anns.Seo4AjaxPath
 				} else {
-					klog.Warningf("Server snippet already configured for server %q, skipping (Ingress %q)",
+					klog.Warningf("Seo4AjaxPath already configured for server %q, skipping (Ingress %q)",
 						host, ingKey)
 				}
 			}
@@ -1442,6 +1442,7 @@ func locationApplyAnnotations(loc *ingress.Location, anns *annotations.Ingress) 
 	loc.ModSecurity = anns.ModSecurity
 	loc.Satisfy = anns.Satisfy
 	loc.Mirror = anns.Mirror
+	loc.PrivatePathExact = anns.PrivatePathExact
 
 	loc.DefaultBackendUpstreamName = defUpstreamName
 }
