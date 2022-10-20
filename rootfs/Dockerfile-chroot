@@ -48,17 +48,17 @@ ENV PATH=$PATH:/usr/local/luajit/bin:/usr/local/nginx/sbin:/usr/local/nginx/bin
 RUN apk update \
   && apk upgrade \
   && apk add -U --no-cache \
-     bash \
-     curl \
-     openssl \
-     ca-certificates \
-     dumb-init \
-     tzdata \
-     diffutils \
-     util-linux \
+  bash \
+  curl \
+  openssl \
+  ca-certificates \
+  dumb-init \
+  tzdata \
+  diffutils \
+  util-linux \
   && ln -s /usr/local/nginx/sbin/nginx /sbin/nginx \
   && adduser -S -D -H -u 101 -h /usr/local/nginx \
-    -s /sbin/nologin -G www-data -g www-data www-data 
+  -s /sbin/nologin -G www-data -g www-data www-data 
 
 COPY --from=chroot /chroot /chroot
 
@@ -75,11 +75,11 @@ WORKDIR /chroot/etc/nginx
 # with volumes (custom templates)
 RUN bash -xeu -c ' \
   writeDirs=( \
-    /var/log \
+  /var/log \
   ); \
   for dir in "${writeDirs[@]}"; do \
-    mkdir -p ${dir}; \
-    chown -R www-data.www-data ${dir}; \
+  mkdir -p ${dir}; \
+  chown -R www-data.www-data ${dir}; \
   done' \
   # LD_LIBRARY_PATH does not work so below is needed for  opentelemetry/other modules
   # Put libs of newer modules under `/modules_mount/<other>/lib` and add that path below
@@ -124,4 +124,6 @@ EXPOSE 80 443
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 CMD ["/nginx-ingress-controller"]
- 
+
+
+VOLUME [ "/maintenance", "/redirection", "/IPWhitelist" ]

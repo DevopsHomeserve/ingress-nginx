@@ -36,7 +36,7 @@ WORKDIR  /etc/nginx
 RUN apk update \
   && apk upgrade \
   && apk add --no-cache \
-    diffutils \
+  diffutils \
   && rm -rf /var/cache/apk/*
 
 COPY --chown=www-data:www-data etc /etc
@@ -49,22 +49,22 @@ COPY --chown=www-data:www-data bin/${TARGETARCH}/wait-shutdown /
 # with volumes (custom templates)
 RUN bash -xeu -c ' \
   writeDirs=( \
-    /etc/ingress-controller \
-    /etc/ingress-controller/ssl \
-    /etc/ingress-controller/auth \
-    /var/log \
-    /var/log/nginx \
-    /tmp/nginx \
+  /etc/ingress-controller \
+  /etc/ingress-controller/ssl \
+  /etc/ingress-controller/auth \
+  /var/log \
+  /var/log/nginx \
+  /tmp/nginx \
   ); \
   for dir in "${writeDirs[@]}"; do \
-    mkdir -p ${dir}; \
-    chown -R www-data.www-data ${dir}; \
+  mkdir -p ${dir}; \
+  chown -R www-data.www-data ${dir}; \
   done' \
   # LD_LIBRARY_PATH does not work so below is needed for  opentelemetry/other modules
   # Put libs of newer modules under `/modules_mount/<other>/lib` and add that path below
   # Could get complicated arch specific paths become a need
   && echo "/lib:/usr/lib:/usr/local/lib:/modules_mount/etc/nginx/modules/otel" > /etc/ld-musl-x86_64.path
-  
+
 
 RUN apk add --no-cache libcap \
   && setcap    cap_net_bind_service=+ep /nginx-ingress-controller \
@@ -74,9 +74,9 @@ RUN apk add --no-cache libcap \
   && setcap    cap_net_bind_service=+ep /usr/bin/dumb-init \
   && setcap -v cap_net_bind_service=+ep /usr/bin/dumb-init \
   && apk del libcap \
-  && ln -sf /usr/local/nginx/sbin/nginx /usr/bin/nginx
+  && ln -sf /usr/local/nginx/sbin/nginx /usr/bin/nginx \
 
-USER www-data
+  USER www-data
 
 # Create symlinks to redirect nginx logs to stdout and stderr docker log collector
 RUN  ln -sf /dev/stdout /var/log/nginx/access.log \
@@ -85,3 +85,6 @@ RUN  ln -sf /dev/stdout /var/log/nginx/access.log \
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 CMD ["/nginx-ingress-controller"]
+
+VOLUME [ "/maintenance", "/redirections", "/common" ]
+

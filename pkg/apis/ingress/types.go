@@ -207,6 +207,9 @@ type Server struct {
 	// MaintenancePageUrl overrides url of the maintenance Page
 	// +optional
 	MaintenancePageUrl string `json:"maintenancePageUrl"`
+	// MaintenancePageUrl overrides url of the maintenance Page
+	// +optional
+	Seo4AjaxPath string `json:"seo4AjaxPath"`
 	// ServerSnippet returns the snippet of server
 	// +optional
 	ServerSnippet string `json:"serverSnippet"`
@@ -357,6 +360,8 @@ type Location struct {
 	// Opentracing allows the global opentracing setting to be overridden for a location
 	// +optional
 	Opentracing opentracing.Config `json:"opentracing"`
+
+	PrivatePathExact []string `json:"privatepathexact"`
 }
 
 // SSLPassthroughBackend describes a SSL upstream server configured

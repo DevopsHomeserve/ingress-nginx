@@ -312,6 +312,10 @@ func (s1 *Server) Equal(s2 *Server) bool {
 	if s1.MaintenancePageUrl != s2.MaintenancePageUrl {
 		return false
 	}
+
+	if s1.Seo4AjaxPath != s2.Seo4AjaxPath {
+		return false
+	}
 	if s1.ServerSnippet != s2.ServerSnippet {
 		return false
 	}
