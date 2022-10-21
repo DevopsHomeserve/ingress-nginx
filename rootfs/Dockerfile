@@ -74,9 +74,9 @@ RUN apk add --no-cache libcap \
   && setcap    cap_net_bind_service=+ep /usr/bin/dumb-init \
   && setcap -v cap_net_bind_service=+ep /usr/bin/dumb-init \
   && apk del libcap \
-  && ln -sf /usr/local/nginx/sbin/nginx /usr/bin/nginx \
+  && ln -sf /usr/local/nginx/sbin/nginx /usr/bin/nginx
 
-  USER www-data
+USER www-data
 
 # Create symlinks to redirect nginx logs to stdout and stderr docker log collector
 RUN  ln -sf /dev/stdout /var/log/nginx/access.log \
@@ -85,6 +85,3 @@ RUN  ln -sf /dev/stdout /var/log/nginx/access.log \
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 CMD ["/nginx-ingress-controller"]
-
-VOLUME [ "/maintenance", "/redirections", "/common" ]
-

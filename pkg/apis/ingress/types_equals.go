@@ -376,6 +376,22 @@ func (l1 *Location) Equal(l2 *Location) bool {
 		}
 	}
 
+	if len(l1.PrivatePathExact) != len(l2.PrivatePathExact) {
+		return false
+	}
+	for _, b1 := range l1.PrivatePathExact {
+		found := false
+		for _, b2 := range l2.PrivatePathExact {
+			if b1 == b2 {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return false
+		}
+	}
+
 	if l1.Port.String() != l2.Port.String() {
 		return false
 	}
